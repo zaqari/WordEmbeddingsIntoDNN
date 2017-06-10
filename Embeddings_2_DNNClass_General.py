@@ -1,3 +1,8 @@
+#Note: everything in here is grouped according to hared function.
+# That means that everything to do with import files will be up top,
+# all data manipulations for generating the training data is grouped
+# together, etc.
+
 #All the imports.
 import gensim
 import codecs
@@ -8,43 +13,37 @@ import pandas as pd
 import tempfile
 import codecs
 import csv
+import tensorflow as tf
 
-model = models.Word2Vec.load(input('Where are your word embeddings coming from, shitbags? '))
-
-word = model.wv.vocab
-
+#In order to build a tag-embedding layer for EVERYTHING.
 readfile = input('Where are your fucking morphemes and tags, fuckface???  ')
-
-readinto_COLUMNS = ['word', 'tag']
-
+readinto_COLUMNS = ['word', 'tags']
 df_readinto = pd.read_csv(readfile, names=readinto_COLUMNS, skipinitialspace=True)
+NCLASSES = len(df_readinto['tags']) + 1
+print(NCLASSES)
 
-label_values = list(df_readinto['tags'].values)
-vec_values = list(df_readinto['word'].values)
-for item in label values:
-    if lexeme in item:
-        array.append(list(model[vec_values[label_values.index(item)]]))
-        array.append(inty)
-        databuilder.writerow(array)
-        array=[]
+#variables
+Word2Vecmodel = input('Where are your word embeddings coming from, shitbags? ')
+training_data_location = input('Where is your training data going, goat-gargler?? ')
+
+model = models.Word2Vec.load(Word2Vecmodel)
+word = model.wv.vocab
 
 #Just some notes when the program is run/
 print('Make sure to (1) run build_DNNarray(\'the lexeme you\'re interested in\'), and then (2) run_rabbit_run()')
 
 #Pulls data from the corpus and formats it
-def build_DNNarray(lexeme, WORD=word, MODEL=model):
-    inty=input('What example number is this? (note: 0 is anything that isn\'t being classified)  ')
+def build_DNNarray(WORD=word, MODEL=model):
     array = []
     label_values = list(df_readinto['tags'].values)
     vec_values = list(df_readinto['word'].values)
-    with codecs.open(input('Where is your training data going, fuck-face?? '), 'a', 'utf-8') as csvfile:
+    with codecs.open(training_data_location, 'a', 'utf-8') as csvfile:
         databuilder = csv.writer(csvfile, delimiter=',',
                                  quotechar='|',
                                  quoting=csv.QUOTE_MINIMAL)
         for item in label_values:
-            if lexeme in item:
                 array.append(list(model[vec_values[label_values.index(item)]]))
-                array.append(inty)
+                array.append(label_values.index(item))
                 databuilder.writerow(array)
                 array=[]
     csvfile.close()
@@ -52,13 +51,9 @@ def build_DNNarray(lexeme, WORD=word, MODEL=model):
 
 #Components for the DNN. Since we're playing with vectors,
 #I ended up de-activating sections relating to categorical columns--they weren't necessary.
-COLUMNS = list(range(100)) + ['label']
-
-LABEL_COLUMN = 'label'
-
-CONTINUOUS_COLUMNS = COLUMNS
-
-import tensorflow as tf
+COLUMNS = list(range(100)) + ['tag1']
+LABEL_COLUMN = inty = tf.contrib.layers.sparse_column_with_hash_bucket('tag1', hash_bucket_size=int(1000), dtype=tf.string)
+CONTINUOUS_COLUMNS = list(range(100))
 
 def input_fn(df):
   # Creates a dictionary mapping from each continuous feature column name (k) to
@@ -105,15 +100,15 @@ m = tf.contrib.learn.DNNLinearCombinedClassifier(
     model_dir=model_dir,
     linear_feature_columns=wide_columns,
     dnn_feature_columns=deep_columns,
-    dnn_hidden_units=[100, 50],
-    n_classes=2)
+    dnn_hidden_units=[100],
+    n_classes=NCLASSES)
 
 #run this to put everything together after you've built some training data.
 def run_rabbit_run():
     make_features()
     wide_columns = features
     deep_columns = []
-    df_train = pd.read_csv(input('Can I have your training data? Can I has it? ', names=COLUMNS, skipinitialspace=True))
+    df_train = pd.read_csv(training_data_location, names=COLUMNS, skipinitialspace=True))
     #df_test = pd.read_csv('/Users/ZaqRosen/Desktop/ARAPAHO_test_data.csv', names=COLUMNS, skipinitialspace=True, skiprows=1))
     wide_collumns = make_features()
     m.fit(input_fn=train_input_fn, steps=2000)
