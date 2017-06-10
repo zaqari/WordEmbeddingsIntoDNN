@@ -13,6 +13,21 @@ model = models.Word2Vec.load(input('Where are your word embeddings coming from, 
 
 word = model.wv.vocab
 
+readfile = input('Where are your fucking morphemes and tags, fuckface???  ')
+
+readinto_COLUMNS = ['word', 'tag']
+
+df_readinto = pd.read_csv(readfile, names=readinto_COLUMNS, skipinitialspace=True)
+
+label_values = list(df_readinto['tags'].values)
+vec_values = list(df_readinto['word'].values)
+for item in label values:
+    if lexeme in item:
+        array.append(list(model[vec_values[label_values.index(item)]]))
+        array.append(inty)
+        databuilder.writerow(array)
+        array=[]
+
 #Just some notes when the program is run/
 print('Make sure to (1) run build_DNNarray(\'the lexeme you\'re interested in\'), and then (2) run_rabbit_run()')
 
@@ -20,15 +35,18 @@ print('Make sure to (1) run build_DNNarray(\'the lexeme you\'re interested in\')
 def build_DNNarray(lexeme, WORD=word, MODEL=model):
     inty=input('What example number is this? (note: 0 is anything that isn\'t being classified)  ')
     array = []
+    label_values = list(df_readinto['tags'].values)
+    vec_values = list(df_readinto['word'].values)
     with codecs.open(input('Where is your training data going, fuck-face?? '), 'a', 'utf-8') as csvfile:
         databuilder = csv.writer(csvfile, delimiter=',',
                                  quotechar='|',
                                  quoting=csv.QUOTE_MINIMAL)
-        for item in word:
+        for item in label_values:
             if lexeme in item:
-                array.append(list(model[item]))
+                array.append(list(model[vec_values[label_values.index(item)]]))
                 array.append(inty)
                 databuilder.writerow(array)
+                array=[]
     csvfile.close()
 
 
@@ -101,3 +119,5 @@ def run_rabbit_run():
     m.fit(input_fn=train_input_fn, steps=2000)
     #results = m.evaluate(input_fn=eval_input_fn, steps=20)
     #print(results)
+    var = tf.trainable_variables()
+    print(var)
