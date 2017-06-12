@@ -121,7 +121,7 @@ def run_rabbit_run(Eval=False):
     df_train = pd.read_csv(training_data_location, names=COLUMNS, skipinitialspace=True)
     wide_collumns = make_features()
     m.fit(input_fn=train_input_fn, steps=2000)
-    if Eval=True:
+    if Eval==True:
         df_test = pd.read_csv(input('Where is your test data coming from?  '), names=COLUMNS, skipinitialspace=True, skiprows=1)
         results = m.evaluate(input_fn=eval_input_fn, steps=20)
         print(results)
